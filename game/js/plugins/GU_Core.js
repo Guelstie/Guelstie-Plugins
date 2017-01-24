@@ -217,7 +217,7 @@ var GU = {};(function ($) {
           case 'disable':
             return false;
           default:
-            throw new Error('LTN Core: Cannot parse string to boolean');
+            throw new Error('GU Core: Cannot parse string to boolean');
         }
       }
 
@@ -262,11 +262,11 @@ var GU = {};(function ($) {
       }
 
       /**
-       * Will check if a plugin is registered with LTNCore plugins.
+       * Will check if a plugin is registered with GUCore plugin container.
        *
        * @static
        * @param {String} plugin - The name of the plugin.
-       * @returns Return true if plugin is registered in LTN.Plugins.
+       * @returns Return true if plugin is registered in GU.Plugins.
        *
        * @memberOf Utilities
        */
@@ -281,7 +281,7 @@ var GU = {};(function ($) {
       }
 
       /**
-       * Registers the plugin with LTN.Plugins object and checks the required plugins required for the plugin to work.
+       * Registers the plugin with GU.Plugins object and checks the required plugins required for the plugin to work.
        *
        * @param  {string} name - A string of name of the plugin being registered.
        * @param  {string} version - A string of the version of plugin being registered.

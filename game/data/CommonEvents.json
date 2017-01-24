@@ -1,7 +1,7 @@
 [
 null,
 {"id":1,"list":[{"code":0,"indent":0,"parameters":[]}],"name":"Game Initialize","switchId":1,"trigger":0},
-{"id":2,"list":[{"code":101,"indent":0,"parameters":["",0,1,1]},{"code":401,"indent":0,"parameters":["\\C[4]You started a new quest!"]},{"code":0,"indent":0,"parameters":[]}],"name":"Started Quest","switchId":1,"trigger":0},
-{"id":3,"list":[{"code":101,"indent":0,"parameters":["",0,1,1]},{"code":401,"indent":0,"parameters":["\\C[4]You've completed a quest!"]},{"code":0,"indent":0,"parameters":[]}],"name":"Completed Quest","switchId":1,"trigger":0},
-{"id":4,"list":[{"code":101,"indent":0,"parameters":["",0,1,1]},{"code":401,"indent":0,"parameters":["\\C[4]You've failed a quest!"]},{"code":0,"indent":0,"parameters":[]}],"name":"Failed Quest","switchId":1,"trigger":0}
+{"id":2,"list":[{"code":0,"indent":0,"parameters":[]}],"name":"","switchId":1,"trigger":0},
+{"id":3,"list":[{"code":0,"indent":0,"parameters":[]}],"name":"","switchId":1,"trigger":0},
+{"id":4,"list":[{"code":0,"indent":0,"parameters":[]}],"name":"","switchId":1,"trigger":0}
 ]
