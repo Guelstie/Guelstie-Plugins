@@ -1,10 +1,10 @@
 /**
- * @file LTN Core is a utility plugin for RPG Maker MV.
- * @author LTN Games
+ * @file Guelstie Core is a utility plugin for RPG Maker MV.
+ * @author Guelstie Project
  * @version 0.0.1
  */
 // =============================================================================
-// LTN_Core.js
+// GU_Core.js
 // =============================================================================
 /*:
  @plugindesc v 0.0.1 Guesltie Project core plugin.
@@ -258,6 +258,113 @@ var GU = {};(function ($) {
           return eval(text); // eslint-disable-line no-eval
         } catch (e) {
           throw new Error('There was a problem evaulting your code', e);
+        }
+      }
+
+      /**
+       * Will check if a plugin is registered with LTNCore plugins.
+       *
+       * @static
+       * @param {String} plugin - The name of the plugin.
+       * @returns Return true if plugin is registered in LTN.Plugins.
+       *
+       * @memberOf Utilities
+       */
+
+    }, {
+      key: 'isPluginRegistered',
+      value: function isPluginRegistered(plugin) {
+        if (typeof Plugins[plugin] !== 'undefined') {
+          return true;
+        }
+        return false;
+      }
+
+      /**
+       * Registers the plugin with LTN.Plugins object and checks the required plugins required for the plugin to work.
+       *
+       * @param  {string} name - A string of name of the plugin being registered.
+       * @param  {string} version - A string of the version of plugin being registered.
+       * @param  {string} author - A string for the name of the author of the plugin.
+       * @param  {array}  required - An array of required plugins for the plugin being registered
+       * @returns {none}
+       *
+       * @memberOf Utilities
+       */
+
+    }, {
+      key: 'registerPlugin',
+      value: function registerPlugin(name, version, author, required) {
+        var _this = this;
+
+        if (!name) {
+          throw new Error('No name for registration of plugin! Please ensure you entered a name');
+        }
+        if (this.isPluginRegistered(name)) {
+          throw new Error('Plugin already registered with PluginManager. Please use a unique name');
+        }
+
+        Plugins[name] = {};
+
+        Plugins[name].Alias = {};
+        Plugins[name].Version = version;
+        Plugins[name].Author = author;
+        Plugins[name].Required = required;
+        // Check required plugins if needed.
+        if (required) {
+          Plugins[name].Required.forEach(function (plugin) {
+            if (!PluginManager.isPlugin(plugin) && !_this.isPluginRegistered(plugin)) {
+              throw new Error('You need to have the required plugin ' + plugin + ' for ' + name + ' to work correctly.');
+            }
+          });
+        }
+      }
+
+      /**
+       * Retieves plugins namespace module for access to aliases, and exported objects/functions.
+       *
+       * @static
+       * @param {Object} name - The utility to aquire, if you only need one..
+       * @param {Boollean} all - Aquire all plugins?
+       * @returns {Boolean} Return the plugins namepsace/module
+       *
+       * @memberOf Utilities
+       */
+
+    }, {
+      key: 'requirePlugin',
+      value: function requirePlugin(all, name) {
+        if (all) {
+          return Plugins;
+        }
+        if (!this.isPluginRegistered(name)) {
+          throw new Error('Unable to find a registered plugin by the name: ' + name);
+        }
+        return Plugins[name];
+      }
+
+      /**
+       * Retieves a registered plugins aliased methods.
+       *
+       * @static
+       * @param {String} pluginName
+       * @param {Boolean} all
+       * @param {String} aliasName
+       * @returns {Boolean} Return the plugins aliased methods.
+       *
+       * @memberOf Utilities
+       */
+
+    }, {
+      key: 'requireAlias',
+      value: function requireAlias(pluginName, all, aliasName) {
+        if (!this.isPluginRegistered(pluginName)) {
+          throw new Error('Unable to find a registered plugin by the name: ' + pluginName);
+        }
+        if (all) {
+          return Plugins[pluginName].Alias;
+        } else if (aliasName) {
+          return Plugins[pluginName].Alias[aliasName];
         }
       }
       /* End Of Utilities Class */
