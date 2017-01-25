@@ -3,5 +3,5 @@
 var $plugins =
 [
 {"name":"GU_Core","status":true,"description":"v 0.0.1 Guesltie Project core plugin.","parameters":{"================":"","Resolution Options":"","Screen Width":"816","Screen Height":"624"}},
-{"name":"GU_AdCore","status":false,"description":"v 0.0.1 Guesltie Project Ad-Sense Core plugin.","parameters":{"Ad Tag":""}}
+{"name":"GU_AdCore","status":true,"description":"v 0.0.1 Guesltie Project Ad-Sense Core plugin.","parameters":{"Ad Tag":""}}
 ];
