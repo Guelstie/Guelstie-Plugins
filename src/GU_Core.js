@@ -318,6 +318,7 @@ const GU = {}
   }
 
   /* -------------- Exports -------------- */
+  // GU.Utilities
   $.Utilities = Utilities
 })(GU)
 

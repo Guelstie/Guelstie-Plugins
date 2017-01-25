@@ -11,7 +11,7 @@ const glebab = require('gulp-lebab')
 const production = false
 
 const CONFIG = {
-  file: production ? '*.js' : 'LTN_' + 'Waypoints.js',
+  file: production ? '*.js' : 'GU_' + 'AdCore.js',
   src: './src/',
   build: production ? './releases/' : './game/js/plugins/'
 }
