@@ -103,6 +103,7 @@
     },
     "rules": {
         "no-console":"off",
+        "no-warning-comments": "off",
         "camelcase":"off",
         "no-unexpected-multiline":"error",
         "brace-style": "error",

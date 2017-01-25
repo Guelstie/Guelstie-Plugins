@@ -60,16 +60,16 @@ if (typeof google === 'undefined') {
   /* Add Google IMA3 SDK to the DOM for Google AdSense
   * FIXME Won't load file due to Access control header with XHR request
   */
-  // const script = document.createElement('script')
-  // script.type = 'text/javascript'
-  // script.src = '//imasdk.googleapis.com/js/sdkloader/ima3.js'
-  // document.body.appendChild(script)
-  // console.log(script)
-  // /* Add style.css to DOM */
-  // const css = document.createElement('link')
-  // css.type = 'text/css'
-  // css.src = '/style.css'
-  // document.body.appendChild(css)
+  const script = document.createElement('script')
+  script.type = 'text/javascript'
+  script.src = '//imasdk.googleapis.com/js/sdkloader/ima3.js'
+  document.body.appendChild(script)
+  console.log(script)
+  /* Add style.css to DOM */
+  const css = document.createElement('link')
+  css.type = 'text/css'
+  css.src = '/style.css'
+  document.body.appendChild(css)
 }
 
 /* Will need to create a custom MV class to handle the video player, probably a new canvas with PIXI elements these elements
@@ -183,7 +183,7 @@ will need to be associated with the AdsManager class
       adsManager.addEventListener(errorEvent, this.onAddError, false, this)
       this.addEventsForAdsManager(adsManager)
 
-      if (this.application_.fullscreen) {
+      if (this._application.fullscreen) {
         initWidth = this._application.fullscreenWidth
         initHeight = this._application.fullscreenHeight
       } else {
@@ -220,7 +220,7 @@ will need to be associated with the AdsManager class
       this._application.log('Ad event: ' + adEvent.type)
 
       if (adEvent.type === IMA.AdEvent.Type.CLICK) {
-        this.application_.adClicked()
+        this._application.adClicked()
       } else if (adEvent.type === IMA.AdEvent.Type.LOADED) {
         const ad = adEvent.getAd()
         if (!ad.isLinear()) {
