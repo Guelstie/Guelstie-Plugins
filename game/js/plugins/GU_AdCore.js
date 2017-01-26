@@ -64,6 +64,7 @@ if (typeof GU === 'undefined') {
 if (typeof google === 'undefined') {
   /* Add Google IMA3 SDK to the DOM for Google AdSense
   * FIXME Won't load file due to Access control header with XHR request
+  * For now, I inserted script tag in index.html. May be only choice.
   */
   var script = document.createElement('script');
   script.type = 'text/javascript';
@@ -197,7 +198,7 @@ will need to be associated with the AdsManager class
         var contentResumeEvent = IMA.AdEvent.Type.CONTENT_RESUME_REQUESTED;
         var errorEvent = IMA.AdErrorEvent.Type.AD_ERROR;
         // Attach the pause/resume events.
-        adsManager.addEventListener(contentPauseEvent, this.onContentPauseRequested, false, this);
+        adsManager.addEventListener(contentPauseEvent, this.onContenPaused, false, this);
         adsManager.addEventListener(contentResumeEvent, this.onContentResumeRequested, false, this);
         // Handle errors.
         adsManager.addEventListener(errorEvent, this.onAddError, false, this);
@@ -225,14 +226,14 @@ will need to be associated with the AdsManager class
         }
       }
     }, {
-      key: 'onContentPauseRequested',
-      value: function onContentPauseRequested() {
+      key: 'onContenPaused',
+      value: function onContenPaused() {
         this._application.pauseForAd();
         this._application.setVideoEndedCallbackEnabled(false);
       }
     }, {
-      key: 'onContentResumeRequested',
-      value: function onContentResumeRequested() {
+      key: 'onContentResume',
+      value: function onContentResume() {
         this._application.setVideoEndedCallbackEnabled(true);
         if (!this.contentCompleteCalled) {
           this._application.resumeAfterAd();
@@ -248,7 +249,7 @@ will need to be associated with the AdsManager class
         } else if (adEvent.type === IMA.AdEvent.Type.LOADED) {
           var ad = adEvent.getAd();
           if (!ad.isLinear()) {
-            this.onContentResumeRequested();
+            this.onContentResume();
           }
         }
       }
@@ -266,5 +267,107 @@ will need to be associated with the AdsManager class
     return AdsManager;
   }();
 
-  console.log(GU.Utilities.requirePlugin(false, 'AdCore'));
+  /**
+   * The AdSense video player for RPG Maker MV
+   *
+   * @class VideoAdPlayer
+   */
+
+
+  var VideoAdPlayer = function () {
+    function VideoAdPlayer(width, height) {
+      _classCallCheck(this, VideoAdPlayer);
+
+      this._width = width;
+      this._height = height;
+      this.createContainerElements();
+      this.preloadListener = null;
+    }
+
+    _createClass(VideoAdPlayer, [{
+      key: 'createContainerElements',
+      value: function createContainerElements() {
+        var _this = this;
+
+        var videoContainer = document.createElement('div');
+        var video = document.createElement('video');
+        var adsContainer = document.createElement('div');
+        /* FIXME - onload don't seem to be working, find alternative or find solution to onload */
+        videoContainer.onload = function () {
+          _this.videoContainer = document.getElementById('videoPlayer');
+          _this.adsContainer = document.getElementById('adsContainer');
+          videoContainer.id = 'videoPlayer';
+          video.id = 'videoAd';
+          video.style.opacity = 0;
+          adsContainer.id = 'adsContainer';
+          document.body.appendChild(videoContainer);
+          document.body.appendChild(adsContainer);
+          _this.video = document.getElementById('videoAd');
+          _this.videoContainer.appendChild(video);
+          _this.updateVideo();
+          console.log('Loaded elements and updating video');
+        };
+      }
+    }, {
+      key: 'updateVideo',
+      value: function updateVideo() {
+        this.video.width = this._width;
+        this.video.height = this._height;
+        this.video.style.zIndex = 2;
+        Graphics._centerElement(this.video);
+      }
+    }, {
+      key: 'preloadContent',
+      value: function preloadContent(loadAction) {
+        if (Utils.isMobileDevice() || Utils.isMobileSafari()) {
+          this.preloadListener = loadAction;
+          this.video.addEventListener('loadmetadata', loadAction, false);
+          this.video.load();
+        } else {
+          loadAction();
+        }
+      }
+    }, {
+      key: 'removePreloadListener',
+      value: function removePreloadListener() {
+        if (this.preloadListener) {
+          this.video.removeEventListener('loadmetadata', this.preloadListener, false);
+          this.preloadListener = null;
+        }
+      }
+    }, {
+      key: 'play',
+      value: function play() {
+        this.video.play();
+      }
+    }, {
+      key: 'pause',
+      value: function pause() {
+        this.video.pause();
+      }
+    }, {
+      key: 'resize',
+      value: function resize() {
+        this.updateVideo(this.video);
+      }
+    }, {
+      key: 'registerOnVideoEnd',
+      value: function registerOnVideoEnd(callback) {
+        this.video.addEventListener('ended', callback, false);
+      }
+    }, {
+      key: 'removeOnVideoEnd',
+      value: function removeOnVideoEnd(callback) {
+        this.video.removeEventListener('ended', callback, false);
+        // Remove containers from DOM here...
+      }
+    }]);
+
+    return VideoAdPlayer;
+  }();
+  /* Test what I have */
+
+
+  var videoPlayer = new VideoAdPlayer(Graphics.width, Graphics.height);
+  var ads = new AdsManager(null, videoPlayer);
 })(GU.Utilities.requirePlugin(false, 'AdCore'));

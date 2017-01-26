@@ -66,8 +66,8 @@ Ensure changes are eslint validated. Our ESLint configuration file is provided i
 
 [Pull Request Docs](https://help.github.com/articles/about-pull-requests/)
 
-### Using Brackets Code Editor
-[Brakctes Git Guide](https://github.com/ltngames/Guelstie-Plugins/tree/dev/readme-assets/brackets-contributing.md)
+### Using Brackets Code Editor To Contribute
+[Brakctes Git Guide](https://github.com/Guelstie/Guelstie-Plugins/blob/dev/readme-assets/brackets-contributing.md)
 
 
 ## Coding style preferences are not contributions
