@@ -59,6 +59,7 @@ if (typeof GU === 'undefined') {
 if (typeof google === 'undefined') {
   /* Add Google IMA3 SDK to the DOM for Google AdSense
   * FIXME Won't load file due to Access control header with XHR request
+  * For now, I inserted script tag in index.html. May be only choice.
   */
   const script = document.createElement('script')
   script.type = 'text/javascript'
@@ -177,7 +178,7 @@ will need to be associated with the AdsManager class
       const contentResumeEvent = IMA.AdEvent.Type.CONTENT_RESUME_REQUESTED
       const errorEvent = IMA.AdErrorEvent.Type.AD_ERROR
       // Attach the pause/resume events.
-      adsManager.addEventListener(contentPauseEvent, this.onContentPauseRequested, false, this)
+      adsManager.addEventListener(contentPauseEvent, this.onContenPaused, false, this)
       adsManager.addEventListener(contentResumeEvent, this.onContentResumeRequested, false, this)
       // Handle errors.
       adsManager.addEventListener(errorEvent, this.onAddError, false, this)
@@ -205,12 +206,12 @@ will need to be associated with the AdsManager class
       }
     }
 
-    onContentPauseRequested () {
+    onContenPaused () {
       this._application.pauseForAd()
       this._application.setVideoEndedCallbackEnabled(false)
     }
 
-    onContentResumeRequested () {
+    onContentResume () {
       this._application.setVideoEndedCallbackEnabled(true)
       if (!this.contentCompleteCalled) {
         this._application.resumeAfterAd()
@@ -224,7 +225,7 @@ will need to be associated with the AdsManager class
       } else if (adEvent.type === IMA.AdEvent.Type.LOADED) {
         const ad = adEvent.getAd()
         if (!ad.isLinear()) {
-          this.onContentResumeRequested()
+          this.onContentResume()
         }
       }
     }
@@ -237,5 +238,87 @@ will need to be associated with the AdsManager class
       this._application.resumeAfterAd()
     }
   }
-  console.log(GU.Utilities.requirePlugin(false, 'AdCore'))
+
+  /**
+   * The AdSense video player for RPG Maker MV
+   *
+   * @class VideoAdPlayer
+   */
+  class VideoAdPlayer {
+    constructor (width, height) {
+      this._width = width
+      this._height = height
+      this.createContainerElements()
+      this.preloadListener = null
+    }
+
+    createContainerElements () {
+      const videoContainer = document.createElement('div')
+      const video = document.createElement('video')
+      const adsContainer = document.createElement('div')
+      /* FIXME - onload don't seem to be working, find alternative or find solution to onload */
+      videoContainer.onload = () => {
+        this.videoContainer = document.getElementById('videoPlayer')
+        this.adsContainer = document.getElementById('adsContainer')
+        videoContainer.id = 'videoPlayer'
+        video.id = 'videoAd'
+        video.style.opacity = 0
+        adsContainer.id = 'adsContainer'
+        document.body.appendChild(videoContainer)
+        document.body.appendChild(adsContainer)
+        this.video = document.getElementById('videoAd')
+        this.videoContainer.appendChild(video)
+        this.updateVideo()
+        console.log('Loaded elements and updating video')
+      }
+    }
+
+    updateVideo () {
+      this.video.width = this._width
+      this.video.height = this._height
+      this.video.style.zIndex = 2
+      Graphics._centerElement(this.video)
+    }
+
+    preloadContent (loadAction) {
+      if (Utils.isMobileDevice() || Utils.isMobileSafari()) {
+        this.preloadListener = loadAction
+        this.video.addEventListener('loadmetadata', loadAction, false)
+        this.video.load()
+      } else {
+        loadAction()
+      }
+    }
+
+    removePreloadListener () {
+      if (this.preloadListener) {
+        this.video.removeEventListener('loadmetadata', this.preloadListener, false)
+        this.preloadListener = null
+      }
+    }
+
+    play () {
+      this.video.play()
+    }
+
+    pause () {
+      this.video.pause()
+    }
+
+    resize () {
+      this.updateVideo(this.video)
+    }
+
+    registerOnVideoEnd (callback) {
+      this.video.addEventListener('ended', callback, false)
+    }
+
+    removeOnVideoEnd (callback) {
+      this.video.removeEventListener('ended', callback, false)
+      // Remove containers from DOM here...
+    }
+  }
+  /* Test what I have */
+  const videoPlayer = new VideoAdPlayer(Graphics.width, Graphics.height)
+  const ads = new AdsManager(null, videoPlayer)
 })(GU.Utilities.requirePlugin(false, 'AdCore'))
