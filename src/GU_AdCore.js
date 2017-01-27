@@ -16,6 +16,11 @@
  Default:
  @default
 
+@param Locale
+ @desc The language the Ads should be displayed in
+ Default: en-us
+ @default
+
  ================================================================================
 ▼ TERMS OF USE
 ================================================================================
@@ -62,10 +67,11 @@ if (typeof google === 'undefined') {
   * For now, I inserted script tag in index.html. May be only choice.
   */
   const script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.src = '//imasdk.googleapis.com/js/sdkloader/ima3.js'
-  document.body.appendChild(script)
-  console.log(script)
+  script.onload = () => {
+    script.type = 'text/javascript'
+    script.src = '//imasdk.googleapis.com/js/sdkloader/ima3.js'
+    document.body.appendChild(script)
+  }
   /* Add style.css to DOM */
   const css = document.createElement('link')
   css.type = 'text/css'
@@ -86,7 +92,6 @@ will need to be associated with the AdsManager class
    */
   class AdsManager {
     constructor (application, videoPlayer) {
-      // TODO customClick must point to a button in the dom. I'll maniuplate so it's a sprite button from RPG Maker MV
       this._application = application
       this._videoPlayer = videoPlayer
       this._contentComplete = false
@@ -94,6 +99,13 @@ will need to be associated with the AdsManager class
       this._adDisplayContainer = null
       this._adsLoader = null
       this._adsManager = null
+      this.createAdsDisplayContainer()
+      this.initialUserAction()
+      this.requestAds('https://pubads.g.doubleclick.net/' +
+        'gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&' +
+        'ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&' +
+        'unviewed_position_start=1&' +
+        'cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=')
     }
 
     initialize () {
@@ -104,11 +116,12 @@ will need to be associated with the AdsManager class
       this.addEventListeners()
     }
 
+    /* FIXME - Not all proeprties are available until they've been loaded, find a solution to assign proeprties when they load */
     createAdsDisplayContainer () {
-      const adContainer = this._videPlayer.adContainer
-      const contentPlayer = this._videoPlayer.contentPlayer
-      const clickTracker = this.__customClickDiv
-      /* AdDisplayContainer(containerElement, opt_videoElement, opt_clickTrackingElement */
+      const adContainer = this._videoPlayer.adsContainer
+      const contentPlayer = this._videoPlayer.video
+      const clickTracker = this._videoPlayer.customClickContainer
+
       this._adDisplayContainer = new IMA.AdDisplayContainer(adContainer, contentPlayer, clickTracker)
       this._adsLoader = new IMA.AdsLoader(this._adDisplayContainer)
     }
@@ -122,7 +135,12 @@ will need to be associated with the AdsManager class
 
     initialUserAction () {
       this._adDisplayContainer.initialize()
-      this._videPlayer.contentPlayer.load()
+      // FIXME - Error loading video property of this._videoPlayer.... why?
+      // Tried a setTimeout to see if it had to do with loading but still not working
+      console.log(this._videPlayer)
+      setTimeout(() => {
+        this._videPlayer.video.load()
+      }, 2000)
     }
 
     requestAds (adTagUrl) {
@@ -159,7 +177,7 @@ will need to be associated with the AdsManager class
     }
 
     onAdsManagerLoaded (adsLoadedEvent) {
-      const contentPlayer = this._videoPlayer.contentPlayer
+      const contentPlayer = this._videoPlayer.video
       this._application.log('Ads Loaded')
       const adsRenderingSettings = new IMA.AdsRenderingSetting()
 
@@ -253,23 +271,30 @@ will need to be associated with the AdsManager class
     }
 
     createContainerElements () {
+      // Contains the video element
       const videoContainer = document.createElement('div')
+      // The Video Element
       const video = document.createElement('video')
+      // Ads container contains, pause button and coutndown
       const adsContainer = document.createElement('div')
-      /* FIXME - onload don't seem to be working, find alternative or find solution to onload */
-      videoContainer.onload = () => {
-        this.videoContainer = document.getElementById('videoPlayer')
-        this.adsContainer = document.getElementById('adsContainer')
+      const customClickContainer = document.createElement('div')
+
+      window.onload = () => {
         videoContainer.id = 'videoPlayer'
         video.id = 'videoAd'
-        video.style.opacity = 0
         adsContainer.id = 'adsContainer'
+        video.style.opacity = 0
+        customClickContainer.id = 'customClick'
         document.body.appendChild(videoContainer)
         document.body.appendChild(adsContainer)
-        this.video = document.getElementById('videoAd')
+        document.body.appendChild(customClickContainer)
+        this.videoContainer = document.getElementById('videoPlayer')
+        this.adsContainer = document.getElementById('adsContainer')
+        this.customClickContainer = document.getElementById('customClick')
         this.videoContainer.appendChild(video)
+        this.video = this.videoContainer.childNodes[0]
+        this.video.src = 'http://rmcdn.2mdn.net/Demo/vast_inspector/android.mp4'
         this.updateVideo()
-        console.log('Loaded elements and updating video')
       }
     }
 
@@ -320,5 +345,7 @@ will need to be associated with the AdsManager class
   }
   /* Test what I have */
   const videoPlayer = new VideoAdPlayer(Graphics.width, Graphics.height)
-  const ads = new AdsManager(null, videoPlayer)
+  window.addEventListener('load', () => {
+    const ads = new AdsManager(null, videoPlayer)
+  })
 })(GU.Utilities.requirePlugin(false, 'AdCore'))
