@@ -27,9 +27,11 @@ gulp.task('serve', ['browser-sync', 'watch-folder'], () => {
 })
 
 gulp.task('watch-folder', () => gulp.src(CONFIG.src + '*.js', { base: CONFIG.src })
+    .pipe(sourcemaps.init())
     .pipe(cache('watching'))
     .pipe(watch(CONFIG.src, { base: CONFIG.src }, browserSync.reload()))
     .pipe(babel())
+    .pipe(sourcemaps.write("."))
     .pipe(gulp.dest(CONFIG.build))
     .pipe(browserSync.stream())
 )
