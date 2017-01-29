@@ -9,7 +9,7 @@
 /*:
  @plugindesc v 0.0.1 Guesltie Project core plugin.
 
- @author Guesltie Project
+ @author Guelstie Project
 
  @param ================
  @param  Resolution Options
